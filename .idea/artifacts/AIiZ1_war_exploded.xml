@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="AIiZ1:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/AIiZ1_war_exploded</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="AIiZ1" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.apache.derby:derbyclient:10.17.1.0" />
+          <element id="library" level="project" name="Maven: org.apache.derby:derbyshared:10.17.1.0" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="AIiZ1/web/Web" />
+    </root>
+  </artifact>
+</component>
