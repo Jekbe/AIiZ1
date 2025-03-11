@@ -14,7 +14,7 @@ public class CreateDB {
     private static final String dbURL = "jdbc:derby://localhost:1527/nazwabazy1;create=true;user=test;password=test";
     private static final String tableName = "osoby";
     // jdbc Connection
-    private static Connection conn = null;
+    private static Connection conn = null ;
     private static Statement stmt = null;
 
     public CreateDB() {
@@ -23,7 +23,7 @@ public class CreateDB {
 
     private static void connectDB() {
         try {
-            //Class.forName("org.apache.derby.jdbc.ClientDriver"); //Get a connection
+            Class.forName("org.apache.derby.jdbc.ClientDriver"); //Get a connection
             conn = DriverManager.getConnection(dbURL);
         } catch (Exception except) {
             except.printStackTrace();

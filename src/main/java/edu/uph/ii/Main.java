@@ -1,6 +1,6 @@
 package edu.uph.ii;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 public class Main {
     public static void main(String[] args) throws ServletException {

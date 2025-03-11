@@ -8,10 +8,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class WypiszOsoby extends HttpServlet {
     @Serial
@@ -40,8 +40,7 @@ public class WypiszOsoby extends HttpServlet {
             }
 
             if (conn != null) {
-                DriverManager.getConnection(dbURL +
-                        ";shutdown=true");
+                DriverManager.getConnection(dbURL + ";shutdown=true");
                 conn.close();
             }
         } catch (SQLException sqlExcept) {}
@@ -50,8 +49,7 @@ public class WypiszOsoby extends HttpServlet {
     private void connectDB()
     {
         try {
-            //Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
-//Get a connection
+            Class.forName("org.apache.derby.client.ClientAutoloadedDriver"); //Get a connection
             conn = DriverManager.getConnection(dbURL);
         } catch (Exception except) {
             except.printStackTrace();
