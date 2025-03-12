@@ -25,12 +25,10 @@ public class WypiszOsoby extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        connectDB();
         createTable();
         insertOsoba(1, "Michalina", "Nowakowska");
         insertOsoba(2, "Tadeusz", "Kowalski");
         insertOsoba(3, "Radosław", "Czerwiec");
-        shutdown();
     }
 
     private void shutdown() {
@@ -43,7 +41,9 @@ public class WypiszOsoby extends HttpServlet {
                 DriverManager.getConnection(dbURL + ";shutdown=true");
                 conn.close();
             }
-        } catch (SQLException sqlExcept) {}
+        } catch (SQLException e) {
+            System.out.println("Błąd: " + e);
+        }
     }
 
     private void connectDB()
@@ -51,28 +51,52 @@ public class WypiszOsoby extends HttpServlet {
         try {
             Class.forName("org.apache.derby.client.ClientAutoloadedDriver"); //Get a connection
             conn = DriverManager.getConnection(dbURL);
-        } catch (Exception except) {
-            except.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Błąd: " + e);
         }
     }
 
     private void createTable() {
         try {
+            connectDB();
             stmt = conn.createStatement();
             stmt.execute("create table "+ tableName +"(id int primary key, imie varchar(20), nazwisko varchar(30) )");
             stmt.close();
-        } catch (SQLException sqlExcept) { }
+
+        } catch (SQLException e) {
+            System.out.println("Błąd: " + e);
+        } finally {
+            shutdown();
+        }
     }
 
     private void insertOsoba(int id, String imie, String nazwisko) {
         try {
+            connectDB();
             stmt = conn.createStatement();
             stmt.execute("insert into " + tableName + " values (" + id + ",'" + imie + "','" + nazwisko +"')");
             stmt.close();
-        } catch (SQLException sqlExcept) { }
+        } catch (SQLException e) {
+            System.out.println("Błąd: " + e);
+        } finally {
+            shutdown();
+        }
     }
 
-    private void printData(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void deleteOsoba(int id){
+        try {
+            connectDB();
+            stmt = conn.createStatement();
+            stmt.execute("delete from " + tableName + " where id=" + id);
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("Błąd: " + e);
+        } finally {
+            shutdown();
+        }
+    }
+
+    private void printData(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html; charset=UTF-8");
         PrintWriter out = response.getWriter();
 
@@ -83,7 +107,7 @@ public class WypiszOsoby extends HttpServlet {
         out.println("<body>");
         out.println("<table border=\"1\">");
         out.println("<tr>");
-        out.println("<th>ID</th><th>Imię</th><th>Nazwisko</th>");
+        out.println("<th>ID</th><th>Imię</th><th>Nazwisko</th><th>usuń</th>");
         connectDB();
 
         try {
@@ -94,27 +118,42 @@ public class WypiszOsoby extends HttpServlet {
                 int id = results.getInt(1);
                 String imie = results.getString(2);
                 String nazwisko = results.getString(3);
-                out.println("<tr><td>"+id+"</td><td>"+imie+"</td><td>"+nazwisko+"</td ></tr>");
+                out.println("<tr><td>"+id+"</td><td>"+imie+"</td><td>"+nazwisko+"</td ><td><a href='WypiszOsoby?action=delete&id=" + id + "'>usuń</a></td></tr>");
             }
 
             results.close();
             stmt.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Błąd: " + e);
+        } finally {
+            shutdown();
         }
 
-        shutdown();
-        out.println("</tr>");
-        out.println("</table>");
-        out.println("</body>");
-        out.println("</html>");
+
+        out.println("""
+                </tr>
+                </table><br><br>
+                <form action="WypiszOsoby" method="post">
+                    <input type="hidden" name="action" value="add">
+                    Id: <input type="number" name="id"><br>
+                    Imię: <input type="text" name="imie"><br>
+                    Nazwisko: <input type="text" name="nazwisko"><br>
+                    <input type="submit" value="Dodaj">
+                </form>
+                </body>
+                </html>
+                """);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if ("delete".equals(request.getParameter("action"))) deleteOsoba(Integer.parseInt(request.getParameter("id")));
         printData(request, response);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if ("add".equals(request.getParameter("action"))) insertOsoba(Integer.parseInt(request.getParameter("id")), request.getParameter("imie"), request.getParameter("nazwisko"));
         printData(request, response);
     }
 }
